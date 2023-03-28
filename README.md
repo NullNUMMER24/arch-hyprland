@@ -1,7 +1,8 @@
 # arch-hyprland
 ## Software
-- sudo pacman -Sy libreoffice-still
+- LibreOffice
 - Spotify
+- Google Chrome
 
 ## Scripts
 ### Bluetooth
