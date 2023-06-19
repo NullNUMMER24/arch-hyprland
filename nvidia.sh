@@ -1,18 +1,24 @@
 #!/bin/bash
 
-# Add nvidia_drm.modeset=1 to GRUB_CMDLINE_LINUX_DEFAULT
-sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia_drm.modeset=1"/' /etc/default/grub
+# Update system and install necessary packages
+sudo pacman -Syu --noconfirm
+sudo pacman -S --noconfirm nvidia
 
-# Update GRUB configuration
-sudo grub-mkconfig -o /boot/grub/grub.cfg
+# Install nvidia-dkms driver
+sudo pacman -S --noconfirm nvidia-dkms
 
-# Add modules to mkinitcpio.conf
-sudo sed -i 's/^MODULES=.*$/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+# Add nvidia-dkms to initramfs and kernel parameters
+echo "nvidia_drm.modeset=1" | sudo tee -a /boot/loader/entries/arch.conf
 
-# Generate initramfs image
+# Update initramfs
 sudo mkinitcpio --config /etc/mkinitcpio.conf --generate /boot/initramfs-custom.img
 
-# Create or modify nvidia.conf
+# Add nvidia.conf file for modprobe
 echo "options nvidia-drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf
 
-# !!!!Run as sudo!!!!
+# Install additional packages
+sudo pacman -S --noconfirm qt5-wayland qt5ct libva
+yay -S --noconfirm hyprland-nvidia-git nvidia-vaapi-driver-git
+
+# Reboot the system
+sudo reboot
